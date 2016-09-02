@@ -1,16 +1,47 @@
 <template name="afCloudinary">
+<!-- Template: afCloudinary; File; autoform-cloudinary.html -->
+
   <div class="afCloudinary">
-    {{#if url}}
-      <div class="afCloudinary-thumbnail">
-        <a href="{{url}}" target="_blank"><img src="{{url}}"></a>
-      </div>
-      <a href="#" class="js-remove">Remove</a>
+    {{consoleLog 'inside afCloudinary template'}}
+    {{consoleLog this}}
+
+
+    <div
+      class="well text-centered"
+      style="{{#if srcId}}padding: 0;{{/if}}"
+      data-action="afDropUpload">
+
+      {{!-- <em class="text-muted">This is the img well: {{srcId}}</em> --}}
+      {{!-- TODO: add support for original images --}}
+      {{!-- ALDO: how do we detect if its an img --}}
+      {{#if srcId}}
+
+      <a href="{{c.url srcId}}" target="_blank">
+        <img class="img-responsive img-rounded" src="{{previewUrl}}">
+      </a>
+
+      {{else}}
+
+        <img class="img-responsive" src="/img/placeholderEXOratio.jpg">
+
+      {{/if}}
+      {{!-- <a href="{{srcId}}" target="_blank"><img src="{{srcId}}"></a> --}}
+
+    </div>
+
+
+
+    {{!-- NOW: Handle the buttons --}}
+    {{#if srcId}}
+
+      <button type="button" class="btn btn-default" data-action="afRemoveFile">Remove</button>
+
     {{else}}
-      <button
-        type="button">
-        Browse
-      </button>
+
+      <button type="button" class="btn btn-default" data-action="afSelectFile">{{label}}</button>
+
     {{/if}}
+
     <input
       name="file"
       type="file"
@@ -18,25 +49,58 @@
       data-cloudinary-field="image_id"
       style="display: none"
       accept="{{accept}}"/>
-    <input {{atts}}
-      type="hidden"
-      name="url"
-      value="{{url}}"/>
+
+    <input {{atts}} type="hidden" name="srcId" value="{{srcId}}"/>
+
   </div>
+
+<!-- END Template: afCloudinary; File; autoform-cloudinary.html -->
 </template>
 
-<template name="afCloudinary_bootstrap3">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<template name="afCloudinary_bootstrap4">
+<!-- Template: afCloudinary_bootstrap3; File; autoform-cloudinary.html -->
+{{consoleLog 'inside afCloudinary_bootstrap template'}}
+{{consoleLog this}}
+
   <div class="afCloudinary">
     {{#if url}}
       <div class="afCloudinary-thumbnail">
         <a href="{{url}}" target="_blank"><img src="{{url}}"></a>
       </div>
-      <a href="#" class="js-remove"><span class="glyphicon glyphicon-remove"></span> Remove</a>
+      <a href="#" class="js-remove"><span class="glyphicon glyphicon-remove"></span> The Remove</a>
     {{else}}
       <button
         type="button"
         class="btn btn-default">
-        Browse
+        Go Browse
       </button>
     {{/if}}
     <input
@@ -51,4 +115,6 @@
       name="url"
       value="{{url}}"/>
   </div>
+
+<!-- END Template: afCloudinary_bootstrap3; File; autoform-cloudinary.html -->
 </template>
