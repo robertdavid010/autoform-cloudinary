@@ -123,6 +123,11 @@ Template.afCloudinary.helpers({
     return this.atts.label || 'Choose File';
   },
 
+  origPic: function () {
+    // get the image from collection
+    return this.atts.origPic;
+  }
+
 });
 
 Template.afCloudinary.events({

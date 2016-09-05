@@ -5,6 +5,16 @@
     {{consoleLog 'inside afCloudinary template'}}
     {{consoleLog this}}
 
+    <div class="well">
+      {{#if origPic}}
+      <pre>
+        {{toJSON origPic}}
+      </pre>
+      {{else}}
+      <em class="text-muted">There was no origPic</em>
+      {{/if}}
+    </div>
+
 
     <div
       class="well text-centered"
