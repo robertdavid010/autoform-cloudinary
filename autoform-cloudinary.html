@@ -7,30 +7,24 @@
 
     <div class="well">
       {{#if origPic}}
-      <em class="text-primary">{{srcId}}</em>
+      <em class="text-muted">{{srcId}}</em>
 
-      <pre class="text-primary" style="text-align:left;">
-        {{toJSON origPic}}
-      </pre>
       {{else}}
       <em class="text-muted">There was no origPic</em>
       {{/if}}
     </div>
 
 
-    <div
-      class="well text-centered"
-      style="{{#if srcId}}padding: 0;{{/if}}"
-      data-action="afDropUpload">
+    <div class="well text-centered" data-action="afDropUpload">
 
       {{!-- <em class="text-muted">This is the img well: {{srcId}}</em> --}}
       {{!-- TODO: add support for original images --}}
       {{!-- ALDO: how do we detect if its an img --}}
       {{#if srcId}}
 
-      <a href="{{previewUrl srcId}}" target="_blank">
-        <img class="img-responsive img-rounded" src="{{previewUrl}}">
-      </a>
+        <a href="{{previewUrl srcId}}" target="_blank">
+          <img class="img-responsive img-rounded center-block" src="{{previewUrl}}">
+        </a>
 
       {{else}}
 

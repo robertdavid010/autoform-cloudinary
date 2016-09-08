@@ -27,12 +27,16 @@ Template.afCloudinary.onCreated(function () {
 
         // Check the form data context for item 'currentDoc'
         // as assumed naming convention for any data of a pic
+        console.log("inside autoform-cloudinary.js");
+        console.log("there is no cloudinary data");
 
         // Yes, apparently the form context is 9 levels up...
         var formDoc = Template.parentData(9).currentDoc;
         if (formDoc) {
+          console.log(formDoc);
 
           // Find the fields of interest, and set reactive var 'srcId'
+          // we need to handle pdfs etc...
           if (formDoc.picture) {
 
             self.srcId.set(formDoc.picture)
@@ -121,7 +125,7 @@ Template.afCloudinary.helpers({
     var t = Template.instance();
     var srcId = t.srcId.get();
     var collec = this.atts.collection;
-    var type = this.atts.accept;
+    var accept = this.atts.accept;
     t.checkInitialValue();
 
     // Cloudinary record includes version which starts
@@ -136,25 +140,29 @@ Template.afCloudinary.helpers({
       // if this is an original non-image, we return a flag...
       // YAY we get to map collections to image collections...
       var imgCollections = [
-        {rel: "Campaigns", type: "image", src: "Images"},
-        {rel: "Campaigns", type: "pdf", src: "Pdfs"},
-        {rel: "users", type: "image", src: "ProfilePicture"},
-        {rel: "users", type: "pdf", src: "Mediakit"},
-        {rel: "Posts", type: "image", src: "Postimages"},
+        {rel: "Images", relType: "image", src: "Images"},
+        {rel: "Pdfs", relType: "pdf", src: "Pdfs"},
+        {rel: "ProfilePicture", relType: "image", src: "ProfilePicture"},
+        {rel: "Mediakit", relType: "pdf", src: "Mediakit"},
+        {rel: "Postimages", relType: "image", src: "Postimages"},
 
       ];
 
       var theCollection = imgCollections.filter(function (o) {
-        return (o.rel === collec && type.search(o.type));
+        return (o.rel === collec && accept.search(o.relType));
       }).shift();
 
       console.log("logging inside previewUrl:helper in autoform-cloudinary.js");
       console.log(theCollection);
 
-      var imgSrc = theCollection.src;
 
-      pic = global[imgSrc].findOne(srcId) || null;
-      theUrl = pic.url();
+      var imgSrc = theCollection && theCollection.src;
+
+      if (imgSrc) {
+        pic = global[imgSrc].findOne(srcId) || null;
+        theUrl = pic && pic.url() || null;
+      };
+
 
      // var rec = global[collec].findOne(srcId);
 
