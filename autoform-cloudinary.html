@@ -7,7 +7,9 @@
 
     <div class="well">
       {{#if origPic}}
-      <pre>
+      <em class="text-primary">{{srcId}}</em>
+
+      <pre class="text-primary" style="text-align:left;">
         {{toJSON origPic}}
       </pre>
       {{else}}
@@ -26,7 +28,7 @@
       {{!-- ALDO: how do we detect if its an img --}}
       {{#if srcId}}
 
-      <a href="{{c.url srcId}}" target="_blank">
+      <a href="{{previewUrl srcId}}" target="_blank">
         <img class="img-responsive img-rounded" src="{{previewUrl}}">
       </a>
 

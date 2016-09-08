@@ -6,23 +6,6 @@ AutoForm.addInputType('cloudinary', {
   }
 });
 
-Meteor.startup(function () {
-    // Meteor.call('publicCredentials', function(err, res) {
-    //   if (res) {
-    //     $.cloudinary.config({
-    //       cloud_name: res.cloudName,
-    //       api_key: res.apiKey
-    //     });
-    //   } else {
-    //     $.cloudinary.config({
-    //       cloud_name: Meteor.settings.public.CLOUDINARY_CLOUD_NAME,
-    //       api_key: Meteor.settings.public.CLOUDINARY_API_KEY
-    //     });
-    //   }
-    // });
-});
-
-
 Template.afCloudinary.onCreated(function () {
   var self = this;
 
@@ -31,10 +14,41 @@ Template.afCloudinary.onCreated(function () {
   self.initialValueChecked = false;
   self.checkInitialValue = function () {
     Tracker.nonreactive(function () {
-      if (! self.initialValueChecked && ! self.srcId.get() && self.data.value) {
-        self.srcId.set(self.data.value);
-        self.initialValueChecked = true;
-      }
+      // Perform checks and initialize reactive var 'srcId'
+      if (self.data.value) {
+
+        // Set to existing form field value
+        if (! self.initialValueChecked && ! self.srcId.get()) {
+          self.srcId.set(self.data.value);
+          self.initialValueChecked = true;
+        };
+
+      } else {
+
+        // Check the form data context for item 'currentDoc'
+        // as assumed naming convention for any data of a pic
+
+        // Yes, apparently the form context is 9 levels up...
+        var formDoc = Template.parentData(9).currentDoc;
+        if (formDoc) {
+
+          // Find the fields of interest, and set reactive var 'srcId'
+          if (formDoc.picture) {
+
+            self.srcId.set(formDoc.picture)
+            self.initialValueChecked = true;
+
+          } else if (formDoc.profile && formDoc.profile.picture) {
+
+            // This assumes the form data context is a user document
+            self.srcId.set(formDoc.profile.picture)
+            self.initialValueChecked = true;
+
+          };
+
+        };
+
+      };
     });
   };
 
@@ -51,6 +65,7 @@ Template.afCloudinary.onCreated(function () {
       } else {
         console.log("Success uploading to Cloudinary!");
         console.log(res);
+        // Prepare data for storing in database
         self.srcId.set("v" + res.version + "/" + res.public_id);
       };
     });
@@ -102,11 +117,48 @@ Template.afCloudinary.helpers({
 
   },
   previewUrl: function () {
+    var theUrl;
     var t = Template.instance();
     var srcId = t.srcId.get();
+    var collec = this.atts.collection;
+    var type = this.atts.accept;
     t.checkInitialValue();
-    // Force '.png' file type for previewing all files
-    var theUrl = $.cloudinary.url(srcId + ".png", {width: 480, height: 220, crop: 'limit'});
+
+    // Cloudinary record includes version which starts
+    // with 'v' first char and contains '/'
+    if (srcId && srcId.startsWith("v") && srcId.includes("/")) {
+      // This is a couldinary resource
+      // Force '.png' for previewing all files
+      theUrl = $.cloudinary.url(srcId + ".png", {width: 480, height: 220, crop: 'limit'});
+    } else if (srcId) {
+      // We assume this is a file repo
+      // Also check for types
+      // if this is an original non-image, we return a flag...
+      // YAY we get to map collections to image collections...
+      var imgCollections = [
+        {rel: "Campaigns", type: "image", src: "Images"},
+        {rel: "Campaigns", type: "pdf", src: "Pdfs"},
+        {rel: "users", type: "image", src: "ProfilePicture"},
+        {rel: "users", type: "pdf", src: "Mediakit"},
+        {rel: "Posts", type: "image", src: "Postimages"},
+
+      ];
+
+      var theCollection = imgCollections.filter(function (o) {
+        return (o.rel === collec && type.search(o.type));
+      }).shift();
+
+      console.log("logging inside previewUrl:helper in autoform-cloudinary.js");
+      console.log(theCollection);
+
+      var imgSrc = theCollection.src;
+
+      pic = global[imgSrc].findOne(srcId) || null;
+      theUrl = pic.url();
+
+     // var rec = global[collec].findOne(srcId);
+
+    };
     return theUrl;
   },
   srcId: function () {
@@ -125,7 +177,16 @@ Template.afCloudinary.helpers({
 
   origPic: function () {
     // get the image from collection
-    return this.atts.origPic;
+    // return Template.instance().data;
+    // WOW: 9 levels to get to the context we need...
+    var imgId;
+    var formDoc = Template.parentData(9).currentDoc;
+    if (formDoc && formDoc.picture) {
+      imgId = formDoc.picture;
+    } else if (formDoc && formDoc.profile && formDoc.profile.picture) {
+      imgId = formDoc.profile.picture;
+    };
+    return Template.parentData(2);
   }
 
 });
