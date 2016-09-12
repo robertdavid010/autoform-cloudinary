@@ -15,9 +15,12 @@ Template.afCloudinary.onCreated(function () {
   self.checkInitialValue = function () {
     Tracker.nonreactive(function () {
       // Perform checks and initialize reactive var 'srcId'
+      console.log("checking data context in aotoform-cloudinary.js #05948");
+      console.log(self.data);
       if (self.data.value) {
 
         // Set to existing form field value
+        console.log("there was a field value");
         if (! self.initialValueChecked && ! self.srcId.get()) {
           self.srcId.set(self.data.value);
           self.initialValueChecked = true;
@@ -28,7 +31,7 @@ Template.afCloudinary.onCreated(function () {
         // Check the form data context for item 'currentDoc'
         // as assumed naming convention for any data of a pic
         console.log("inside autoform-cloudinary.js");
-        console.log("there is no cloudinary data");
+        console.log("there was no field data");
 
         // Yes, apparently the form context is 9 levels up...
         // NOTE!!!!!!!!!!!!!!!!!!!!!!!
