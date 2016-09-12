@@ -2,22 +2,21 @@
 <!-- Template: afCloudinary; File; autoform-cloudinary.html -->
 
   <div class="afCloudinary">
-    {{consoleLog 'inside afCloudinary template'}}
-    {{consoleLog this}}
+    {{!-- {{consoleLog 'inside afCloudinary template'}} --}}
+    {{!-- {{consoleLog this}} --}}
 
-    <div class="well">
-      {{#if origPic}}
-      <em class="text-muted">{{srcId}}</em>
+    {{!-- <div class="well"> --}}
+      {{!-- {{#if origPic}} --}}
+      {{!-- <em class="text-muted">{{srcId}}</em> --}}
 
-      {{else}}
-      <em class="text-muted">There was no origPic</em>
-      {{/if}}
-    </div>
+      {{!-- {{else}} --}}
+      {{!-- <em class="text-muted">There was no origPic</em> --}}
+      {{!-- {{/if}} --}}
+    {{!-- </div> --}}
 
 
     <div class="well text-centered" data-action="afDropUpload">
 
-      {{!-- <em class="text-muted">This is the img well: {{srcId}}</em> --}}
       {{!-- TODO: add support for original images --}}
       {{!-- ALDO: how do we detect if its an img --}}
       {{#if srcId}}
@@ -28,7 +27,11 @@
 
       {{else}}
 
-        <img class="img-responsive" src="/img/placeholderEXOratio.jpg">
+        {{#if in 'pdf' atts.accept}}
+          <img class="img-responsive center-block" src="/img/icons/iconPDF_64.png">
+        {{else}}
+          <img class="img-responsive center-block" src="/img/icons/iconCampaignImage_64.png">
+        {{/if}}
 
       {{/if}}
       {{!-- <a href="{{srcId}}" target="_blank"><img src="{{srcId}}"></a> --}}
@@ -40,11 +43,11 @@
     {{!-- NOW: Handle the buttons --}}
     {{#if srcId}}
 
-      <button type="button" class="btn btn-default" data-action="afRemoveFile">Remove</button>
+      <button type="button" class="btn btn-default center-block" data-action="afRemoveFile">Remove</button>
 
     {{else}}
 
-      <button type="button" class="btn btn-default" data-action="afSelectFile">{{label}}</button>
+      <button type="button" class="btn btn-default center-block" data-action="afSelectFile">{{label}}</button>
 
     {{/if}}
 

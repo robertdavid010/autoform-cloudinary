@@ -31,9 +31,14 @@ Template.afCloudinary.onCreated(function () {
         console.log("there is no cloudinary data");
 
         // Yes, apparently the form context is 9 levels up...
+        // NOTE!!!!!!!!!!!!!!!!!!!!!!!
+        // This whole fucking package is not responding to new files.....
+        // it will not update the source url to the new one.
+        // The preview on the upload page is correct. BUT the image
+        // is the PREVIOUS image.. It's the reactive var?
         var formDoc = Template.parentData(9).currentDoc;
+        // console.log(formDoc);
         if (formDoc) {
-          console.log(formDoc);
 
           // Find the fields of interest, and set reactive var 'srcId'
           // we need to handle pdfs etc...
@@ -130,7 +135,8 @@ Template.afCloudinary.helpers({
 
     // Cloudinary record includes version which starts
     // with 'v' first char and contains '/'
-    if (srcId && srcId.startsWith("v") && srcId.includes("/")) {
+    // if (srcId && srcId.startsWith("v") && srcId.includes("/")) {
+    if (true) {
       // This is a couldinary resource
       // Force '.png' for previewing all files
       theUrl = $.cloudinary.url(srcId + ".png", {width: 480, height: 220, crop: 'limit'});
@@ -148,20 +154,20 @@ Template.afCloudinary.helpers({
 
       ];
 
-      var theCollection = imgCollections.filter(function (o) {
-        return (o.rel === collec && accept.search(o.relType));
-      }).shift();
+      // var theCollection = imgCollections.filter(function (o) {
+      //   return (o.rel === collec && accept.search(o.relType));
+      // }).shift();
 
-      console.log("logging inside previewUrl:helper in autoform-cloudinary.js");
-      console.log(theCollection);
+      // console.log("logging inside previewUrl:helper in autoform-cloudinary.js");
+      // console.log(theCollection);
 
 
-      var imgSrc = theCollection && theCollection.src;
+      // var imgSrc = theCollection && theCollection.src;
 
-      if (imgSrc) {
-        pic = global[imgSrc].findOne(srcId) || null;
-        theUrl = pic && pic.url() || null;
-      };
+      // if (imgSrc) {
+      //   pic = global[imgSrc].findOne(srcId) || null;
+      //   theUrl = pic && pic.url() || null;
+      // };
 
 
      // var rec = global[collec].findOne(srcId);
@@ -187,6 +193,7 @@ Template.afCloudinary.helpers({
     // get the image from collection
     // return Template.instance().data;
     // WOW: 9 levels to get to the context we need...
+    // TODO: This is currently unused. Consider removing
     var imgId;
     var formDoc = Template.parentData(9).currentDoc;
     if (formDoc && formDoc.picture) {
