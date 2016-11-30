@@ -10,59 +10,58 @@ Template.afCloudinary.onCreated(function () {
   var self = this;
 
   self.srcId = new ReactiveVar();
+  self.upProg = new ReactiveDict();
 
   self.initialValueChecked = false;
   self.checkInitialValue = function () {
     Tracker.nonreactive(function () {
-      // Perform checks and initialize reactive var 'srcId'
-      console.log("checking data context in aotoform-cloudinary.js #05948");
-      console.log(self.data);
-      if (self.data.value) {
 
+      if (self.data.value) {
         // Set to existing form field value
+        // Initialize reactiveVar to form data value on first run
         console.log("there was a field value");
-        if (! self.initialValueChecked && ! self.srcId.get()) {
+        if (!self.initialValueChecked && !self.srcId.get()) {
           self.srcId.set(self.data.value);
           self.initialValueChecked = true;
-        };
+        }
 
       } else {
-
-        // Check the form data context for item 'currentDoc'
+        // NOTE: All of this is only to support other image sources,
+        // by getting the image srcId from the form context.
         // as assumed naming convention for any data of a pic
-        console.log("inside autoform-cloudinary.js");
         console.log("there was no field data");
 
+        // Check the form data context for image items in form 'currentDoc'
         // Yes, apparently the form context is 9 levels up...
-        // NOTE!!!!!!!!!!!!!!!!!!!!!!!
-        // This whole fucking package is not responding to new files.....
-        // it will not update the source url to the new one.
-        // The preview on the upload page is correct. BUT the image
-        // is the PREVIOUS image.. It's the reactive var?
         var formDoc = Template.parentData(9).currentDoc;
         // console.log(formDoc);
         if (formDoc) {
 
-          // Find the fields of interest, and set reactive var 'srcId'
-          // we need to handle pdfs etc...
+          // Find the fields of interest, and set srcId reactive var
           if (formDoc.picture) {
-
-            self.srcId.set(formDoc.picture)
+            self.srcId.set(formDoc.picture);
             self.initialValueChecked = true;
-
+          } else if (formDoc.pdf) {
+            self.srcId.set(formDoc.pdf);
+            self.initialValueChecked = true;
           } else if (formDoc.profile && formDoc.profile.picture) {
-
             // This assumes the form data context is a user document
-            self.srcId.set(formDoc.profile.picture)
+            self.srcId.set(formDoc.profile.picture);
             self.initialValueChecked = true;
+          }
 
-          };
+        } // END if (formDoc)
 
-        };
+      } // END if (self.data.value)
 
-      };
-    });
-  };
+    }); // END Tracker.nonreactive()
+
+  }; // END self.checkinitialValue()
+
+  self.autorun(function() {
+    // We want to track uplaoding status....?!?!
+
+  });
 
   self.uploadFiles = function (file) {
     // Here we can hand off uploading files..
@@ -92,17 +91,25 @@ Template.afCloudinary.onRendered(function () {
   Meteor.call('afCloudinarySign', function (err, res) {
     if (err) {
       return console.log(err);
+    } else {
+      // Add result of server signing as config DOM object
+      // for full client-side uploading. Can include transformations
+      self.$('input.cloudinary-fileupload[type=file]').cloudinary_fileupload({
+        formData: res
+      });
     }
 
-    // Initialize fields to be used based on server
-    // method call above
-    // self.$('input.cloudinary-fileupload[type=file]').cloudinary_fileupload({
-      // formData: res
-    // });
   });
 
-  /*
-  self.$('input.cloudinary-fileupload[type=file]').on('fileuploaddone', function (e, data) {
+  // Can we take this over for progress?
+  var cdyElem = 'input.cloudinary-fileupload[type=file]';
+  // self.$cdyElem.bind('fil')
+  // self.$('input.cloudinary-fileupload[type=file]').bind('fileuploadprogress', function(e, data) {
+  self.$(cdyElem).bind('fileuploadprogress', function(e, data) {
+    self.$('.progress > .progress-bar').css('width', Math.round((data.loaded * 100.0) / data.total) + '%');
+  });
+
+  self.$(cdyElem).on('fileuploaddone', function (e, data) {
     // Seting data to id instead of url
     console.log("checking results of upload");
     console.log(data.result);
@@ -110,13 +117,12 @@ Template.afCloudinary.onRendered(function () {
     self.srcId.set(data.result.public_id);
     Tracker.flush();
   });
-*/
 
-  self.$("[data-nav='afDropUpload']").on('drop', function (e, data) {
+  // self.$("[data-nav='afDropUpload']").on('drop', function (e, data) {
     // Just testing drag-n-drop implementation
     // self.srcId.set(data.result.secure_url);
     // Tracker.flush();
-  });
+  // });
 
   self.$(self.firstNode).closest('form').on('reset', function () {
     self.srcId.set(null);
@@ -128,54 +134,20 @@ Template.afCloudinary.helpers({
     // This is to handle non-cloudinary images from FS.file
 
   },
+  cdyAtts: function () {
+    var dObj = {};
+    dObj["data-form-data"] = JSON.stringify({
+      "signature": "test"
+    });
+
+    return dObj;
+
+  },
   previewUrl: function () {
-    var theUrl;
     var t = Template.instance();
     var srcId = t.srcId.get();
-    var collec = this.atts.collection;
-    var accept = this.atts.accept;
     t.checkInitialValue();
-
-    // Cloudinary record includes version which starts
-    // with 'v' first char and contains '/'
-    // if (srcId && srcId.startsWith("v") && srcId.includes("/")) {
-    if (true) {
-      // This is a couldinary resource
-      // Force '.png' for previewing all files
-      theUrl = $.cloudinary.url(srcId + ".png", {width: 480, height: 220, crop: 'limit'});
-    } else if (srcId) {
-      // We assume this is a file repo
-      // Also check for types
-      // if this is an original non-image, we return a flag...
-      // YAY we get to map collections to image collections...
-      var imgCollections = [
-        {rel: "Images", relType: "image", src: "Images"},
-        {rel: "Pdfs", relType: "pdf", src: "Pdfs"},
-        {rel: "ProfilePicture", relType: "image", src: "ProfilePicture"},
-        {rel: "Mediakit", relType: "pdf", src: "Mediakit"},
-        {rel: "Postimages", relType: "image", src: "Postimages"},
-
-      ];
-
-      // var theCollection = imgCollections.filter(function (o) {
-      //   return (o.rel === collec && accept.search(o.relType));
-      // }).shift();
-
-      // console.log("logging inside previewUrl:helper in autoform-cloudinary.js");
-      // console.log(theCollection);
-
-
-      // var imgSrc = theCollection && theCollection.src;
-
-      // if (imgSrc) {
-      //   pic = global[imgSrc].findOne(srcId) || null;
-      //   theUrl = pic && pic.url() || null;
-      // };
-
-
-     // var rec = global[collec].findOne(srcId);
-
-    };
+    var theUrl = $.cloudinary.url(srcId + ".png", {width: 480, height: 270, crop: 'fill'});
     return theUrl;
   },
   srcId: function () {
@@ -240,12 +212,19 @@ Template.afCloudinary.events({
   "click [data-action='afRemoveFile']": function(e, t) {
     e.preventDefault();
     t.srcId.set(null);
+    // also need to clear the form...
+    $(e.currentTarget).siblings("input.cloudinary-fileupload[type=file]").val("");
   },
 
   "change input.cloudinary-fileupload[type=file]": function(e, t, data) {
 
-    var file = e.currentTarget.files[0];
-    t.uploadFiles(file);
+    // we should check to see if this is a remove
+    if ($(event.currentTarget).val()) {
+      console.log("we are removing the data")
+    } else {
+      var file = e.currentTarget.files[0];
+      t.uploadFiles(file);
+    }
 
     // return t.uploadFiles(new FS.File(data.files[0]));
   },
