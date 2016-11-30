@@ -5,71 +5,57 @@
 
     <div class="well text-centered" data-action="afDropUpload">
 
-      {{!-- TODO: add support for original images --}}
-      {{!-- ALDO: how do we detect if its an img --}}
-      {{#if srcId}}
+      {{!-- {{#if srcId}} --}}
 
-        <a href="{{previewUrl}}" target="_blank">
-          <img class="img-responsive img-rounded center-block" src="{{previewUrl}}">
-        </a>
+        {{!-- <a href="{{previewUrl}}" target="_blank"> --}}
+          <img class="img-responsive img-rounded center-block afCloudinary-preview" src="{{previewUrl}}">
+        {{!-- </a> --}}
 
-      {{else}}
+      {{!-- {{else}} --}}
 
-        {{!-- {{#if in 'pdf' atts.accept}} --}}
-          <img class="img-responsive center-block" src="/img/icons/{{#if in 'pdf' atts.accept}}iconPDF_64.png{{else}}iconCampaignImage_64.png{{/if}}">
-        {{!-- {{else}} --}}
-          {{!-- <img class="img-responsive center-block" src="/img/icons/iconCampaignImage_64.png"> --}}
-        {{!-- {{/if}} --}}
+          {{!-- <img class="img-responsive center-block" src="/img/icons/{{#if in 'pdf' atts.accept}}iconPDF_64.png{{else}}iconCampaignImage_64.png{{/if}}"> --}}
 
-      {{/if}}
-      {{!-- <a href="{{srcId}}" target="_blank"><img src="{{srcId}}"></a> --}}
+      {{!-- {{/if}} --}}
 
     </div>
 
-
-
-    {{!-- NOW: Handle the buttons --}}
+    {{!-- Display appropriate action button --}}
     {{#if srcId}}
 
-      {{!-- TODO: Here is where we will add the tracking progress of the upload --}}
       {{#unless in 'pdf' atts.accept}}
         <button type="button" class="btn btn-default center-block" data-action="afSelectFile">Replace</button>
-        <div class="progress">
-          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
-            <span class="sr-only">60% Complete</span>
-          </div>
-        </div>
       {{else}}
+        {{!-- Assumes that pdf uploads should have the ability to "remove" the file --}}
         <button type="button" class="btn btn-default center-block" data-action="afRemoveFile">Remove</button>
       {{/unless}}
-
 
     {{else}}
 
       <button type="button" class="btn btn-default center-block" data-action="afSelectFile">{{label}}</button>
 
-      <div class="progress">
-        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
-          <span class="sr-only">60% Complete</span>
-        </div>
-      </div>
-
     {{/if}}
+
+    {{!-- Display progress indicator --}}
+    <div class="progress afCloudinary-progress" style="display:none;">
+      <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100" style="width: 5%;">
+        <span class="sr-only">In Progress...</span>
+      </div>
+    </div>
 
     <input
       name="file"
       type="file"
       class="cloudinary-fileupload"
       data-cloudinary-field="image_id"
-      {{!-- style="display: none" --}}
+      style="display: none"
       accept="{{accept}}" 
       />
 
-    <input {{atts}} {{!-- type="hidden" --}} name="srcId" value="{{srcId}}"/>
+    <input class="afCloudinary-Input" {{atts}} type="hidden" name="srcId" value="{{srcId}}"/>
 
   </div>
 
-<!-- END Template: afCloudinary; File; autoform-cloudinary.html -->
+<!-- END Template: afCloudinary; File: autoform-cloudinary.html -->
 </template>
 
 
@@ -100,8 +86,7 @@
 
 
 
-<template name="afCloudinary_bootstrap4">
-<!-- Template: afCloudinary_bootstrap3; File; autoform-cloudinary.html -->
+<!-- <template name="afCloudinary_bootstrap4">
 {{consoleLog 'inside afCloudinary_bootstrap template'}}
 {{consoleLog this}}
 
@@ -131,5 +116,5 @@
       value="{{url}}"/>
   </div>
 
-<!-- END Template: afCloudinary_bootstrap3; File; autoform-cloudinary.html -->
 </template>
+ -->
