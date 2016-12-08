@@ -142,8 +142,10 @@ Template.afCloudinary.onRendered(function () {
       self.$(".progress").hide();
       self.$("button[type=button]").show();
       self.$(progElem).css("width", "5%");
-      self.$(".afCloudinary-Input").change();
       self.srcId.set("v" + res.version + "/" + res.public_id);
+      Tracker.afterFlush(function() {
+        self.$(".afCloudinary-Input").trigger("change");
+      });
       Tracker.flush();
 
     }
@@ -156,6 +158,15 @@ Template.afCloudinary.onRendered(function () {
 });
 
 Template.afCloudinary.helpers({
+  lowresSrc: function () {
+    var t = Template.instance();
+    var as = t.data.atts;
+    if (as.accept.toLowerCase().indexOf("pdf") != -1) {
+      return "/img/icons/iconPDF_64.png";
+    } else {
+      return "/img/icons/iconCampaignImage_64.png";
+    }
+  },
   previewUrl: function () {
 
     var conf = {};
