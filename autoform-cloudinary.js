@@ -102,18 +102,23 @@ Template.afCloudinary.onRendered(function () {
 
   var cdyElem = "input.cloudinary-fileupload[type=file]";
   var progElem = ".progress-bar:not(.progress-bar-placeholder)";
+  var ats = self.data.atts;
   var cdyParams = self.data.atts.cdyParams;
-  var t = Template.instance();
 
-  Meteor.call('afCloudinarySign', function (err, res) {
+  // I THINK HERE IS WHERE THE CLOUDINARY CONFIG GOES
+  var conf = {};
+  if (cdyParams && ats.accept.toLowerCase().indexOf("pdf") === -1 ) {
+    conf["transformation"] = "c_limit,h_" + cdyParams.height + ",w_" + cdyParams.width
+  }
+
+  Meteor.call('afCloudinarySign', conf, function (err, res) {
+    console.log("!!!!! Results of cloudinary sig");
+    console.log(res);
     if (err) {
       return console.log(err);
     } else {
       // Add result of server signing as config DOM object
       // for full client-side uploading (can include transformations)
-      // if (cdyParams) {
-      //   res["transformation"] = "c_limit,h_" + cdyParams.height + ",w_" + cdyParams.width
-      // }
       self.$(cdyElem).cloudinary_fileupload({
         formData: res
       });
@@ -141,7 +146,8 @@ Template.afCloudinary.onRendered(function () {
   self.$(cdyElem).on('fileuploaddone', function (e, data) {
     var res = data.result;
     if (res) {
-
+      console.log("!#!#!#!#!#!#!#!# WE GOT AN UPLOAD");
+      console.log(res);
       self.$(".progress").hide();
       self.$("button[type=button]").show();
       self.$(progElem).css("width", "5%");
