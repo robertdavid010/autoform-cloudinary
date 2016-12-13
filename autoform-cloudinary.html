@@ -3,6 +3,7 @@
 
   <div class="afCloudinary">
 
+      <em class="text-muted small">{{optimal}}</em>
     <div class="well text-centered" data-action="afDropUpload">
 
       <img class="img-responsive img-rounded center-block afCloudinary-preview" src="{{previewUrl}}" lowsrc="{{lowresSrc}}">
@@ -12,10 +13,10 @@
     {{!-- Display appropriate action button --}}
     {{#if srcId}}
 
-      {{#unless in 'pdf' atts.accept}}
+      {{!-- Assumes that pdf uploads should have the ability to "remove" the file --}}
+      {{#unless in 'pdf' accept}}
         <button type="button" class="btn btn-default center-block" data-action="afSelectFile">Replace</button>
       {{else}}
-        {{!-- Assumes that pdf uploads should have the ability to "remove" the file --}}
         <button type="button" class="btn btn-default center-block" data-action="afRemoveFile">Remove</button>
       {{/unless}}
 
@@ -41,7 +42,7 @@
       accept="{{accept}}" 
       />
 
-    <input class="afCloudinary-Input" {{atts}} type="hidden" name="srcId" value="{{srcId}}"/>
+    <input class="afCloudinary-Input" {{inputAtts}} type="hidden" name="srcId" value="{{srcId}}"/>
 
   </div>
 

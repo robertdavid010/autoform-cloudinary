@@ -29,7 +29,6 @@ Template.afCloudinary.onCreated(function () {
       if (self.data.value) {
         // Set to existing form field value
         // Initialize reactiveVar to form data value on first run
-        console.log("there was a field value");
         if (!self.initialValueChecked && !self.srcId.get()) {
           self.srcId.set(self.data.value);
           self.initialValueChecked = true;
@@ -42,7 +41,6 @@ Template.afCloudinary.onCreated(function () {
         // It helps with migration from existing img data store
         // just put the old images in the template context with
         // the autoform
-        console.log("there was no field data");
 
         // Check the form data context for image items in form 'currentDoc'
         // Yes, apparently the form context is 9 levels up...
@@ -104,6 +102,8 @@ Template.afCloudinary.onRendered(function () {
 
   var cdyElem = "input.cloudinary-fileupload[type=file]";
   var progElem = ".progress-bar:not(.progress-bar-placeholder)";
+  var cdyParams = self.data.atts.cdyParams;
+  var t = Template.instance();
 
   Meteor.call('afCloudinarySign', function (err, res) {
     if (err) {
@@ -111,6 +111,9 @@ Template.afCloudinary.onRendered(function () {
     } else {
       // Add result of server signing as config DOM object
       // for full client-side uploading (can include transformations)
+      // if (cdyParams) {
+      //   res["transformation"] = "c_limit,h_" + cdyParams.height + ",w_" + cdyParams.width
+      // }
       self.$(cdyElem).cloudinary_fileupload({
         formData: res
       });
@@ -174,13 +177,24 @@ Template.afCloudinary.helpers({
     console.log("data context in previewUrl helper");
     console.log(t);
     var as = t.data.atts;
+    var cdy = as.cdyParams || null;
     if (as.accept.toLowerCase().indexOf("pdf") != -1) {
       conf.width = 480; conf.height = 270; conf.crop = "limit";
     } else {
+      conf.crop = "fill";
       if (as["data-schema-key"].toLowerCase().indexOf("profile") != -1 || as.name.toLowerCase().indexOf("profile") != -1) {
-        conf.width = 270; conf.height = 270; conf.crop = "fill";
+        if (cdy) {
+          conf.width = cdy.width; conf.height = cdy.height;
+        } else {
+          conf.width = 256; conf.height = 256;
+        }
       } else {
-        conf.width = 480; conf.height = 270; conf.crop = "fill";
+        if (cdy) {
+          conf.width = cdy.width/2; conf.height = cdy.height/2;
+        } else {
+          conf.width = 800; conf.height = 380;
+        }
+
       }
     }
 
@@ -203,6 +217,20 @@ Template.afCloudinary.helpers({
     return t.srcId.get();
   },
 
+  optimal: function () {
+    var ats = this.atts;
+    var cdy = ats.cdyParams
+    if (cdy) {
+      if (ats.accept.toLowerCase().indexOf("pdf") != -1) {
+        return "(Max file size: " + cdy.maxFileSize + "MB)"
+      } else {
+        return "(Optimal size: " + cdy.width + " x " + cdy.height + ")";
+      }
+    } else {
+      return null
+    }
+  },
+
   accept: function () {
     return this.atts.accept || 'image/*';
   },
@@ -210,6 +238,21 @@ Template.afCloudinary.helpers({
   label: function () {
     return this.atts.label || 'Choose File';
   },
+
+  inputAtts: function () {
+    var ats = this.atts;
+    var attributes = {};
+    for (var e in ats) {
+      if (e != "cdyParams") {
+        attributes[e] = ats[e];  
+      }
+    }
+    // var result = ats.filter(function (item) {
+      // return !item.cdyParams;
+    // });
+    // delete ats.cdyParams;
+    return attributes;
+  }
 
 });
 
