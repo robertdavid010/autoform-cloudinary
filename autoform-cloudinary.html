@@ -3,7 +3,7 @@
 
   <div class="afCloudinary">
 
-      <em class="text-muted small">{{optimal}}</em>
+      {{#if optimal}}<em class="text-muted small">{{optimal}}</em>{{/if}}
     <div class="well text-centered" data-action="afDropUpload">
 
       <img class="img-responsive img-rounded center-block afCloudinary-preview" src="{{previewUrl}}" lowsrc="{{lowresSrc}}">
