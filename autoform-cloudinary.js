@@ -170,7 +170,7 @@ Template.afCloudinary.helpers({
   },
   previewUrl: function () {
     var t = Template.instance();
-    var as = t.data.atts;
+    var as = t.data && t.data.atts;
     var cdy = as.cdyParams || null;
     // These are the default dimensions
     var conf = {width: 480, height: 270};
@@ -182,7 +182,7 @@ Template.afCloudinary.helpers({
       // Assume any field with profile in it, will be a square img
       // TODO: check for schema dimenstions to determine preview size (1/2 etc)
       if (as["data-schema-key"].toLowerCase().indexOf("profile") != -1 || as.name.toLowerCase().indexOf("profile") != -1) {
-        if (cdy.width && cdy.height) {
+        if (cdy && cdy.width && cdy.height) {
           conf.width = cdy.width; conf.height = cdy.height;
         } else {
           conf.width = 256; conf.height = 256;
@@ -190,6 +190,8 @@ Template.afCloudinary.helpers({
       } else {
         if (cdy) {
           conf.width = cdy.width/2; conf.height = cdy.height/2;
+        } else {
+          conf.width = 600; conf.height = 320;
         }
 
       }
