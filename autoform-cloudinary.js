@@ -8,52 +8,55 @@ AutoForm.addInputType('cloudinary', {
 
 Template.afCloudinary.onCreated(function () {
   var self = this;
+  var t = Template.currentData();
+  // var collect = t.atts.collection;
+  var docType = t.atts.accept;
+  var formDoc = Template.parentData(9).currentDoc;
 
   self.srcId = new ReactiveVar();
+
+  // check for data, check for cdy
+  
+
+  if (formDoc && docType && docType.search(/pdf/i)) {
+    // This is the pdf case
+    if (formDoc.pdf) {
+
+      self.srcId.set(formDoc.pdf);
+
+    } else if (formDoc.profile && formDoc.profile.mediakit) {
+
+      self.srcId.set(formDoc.profile.mediakit);
+
+    };
+
+
+  // We assume all other images
+  } else if (formDoc && formDoc.profile && formDoc.profile.picture) {
+
+    // this is a profile picture
+    self.srcId.set(formDoc.profile.picture);
+
+  } else if (formDoc && formDoc.picture) {
+    // this is some other picture
+    self.srcId.set(formDoc.picture);
+
+  };
+
 
   self.initialValueChecked = false;
   self.checkInitialValue = function () {
     Tracker.nonreactive(function () {
-      // Perform checks and initialize reactive var 'srcId'
-      if (self.data.value) {
 
-        // Set to existing form field value
-        if (! self.initialValueChecked && ! self.srcId.get()) {
-          self.srcId.set(self.data.value);
-          self.initialValueChecked = true;
-        };
 
-      } else {
-
-        // Check the form data context for item 'currentDoc'
-        // as assumed naming convention for any data of a pic
-        console.log("inside autoform-cloudinary.js");
-        console.log("there is no cloudinary data");
-
-        // Yes, apparently the form context is 9 levels up...
-        var formDoc = Template.parentData(9).currentDoc;
-        if (formDoc) {
-          console.log(formDoc);
-
-          // Find the fields of interest, and set reactive var 'srcId'
-          // we need to handle pdfs etc...
-          if (formDoc.picture) {
-
-            self.srcId.set(formDoc.picture)
-            self.initialValueChecked = true;
-
-          } else if (formDoc.profile && formDoc.profile.picture) {
-
-            // This assumes the form data context is a user document
-            self.srcId.set(formDoc.profile.picture)
-            self.initialValueChecked = true;
-
-          };
-
-        };
-
+      // Set to existing form field value
+      if (! self.initialValueChecked && ! self.srcId.get() && self.data.value) {
+        self.srcId.set(self.data.value);
+        self.initialValueChecked = true;
       };
+
     });
+
   };
 
   self.uploadFiles = function (file) {
@@ -124,7 +127,7 @@ Template.afCloudinary.helpers({
     var theUrl;
     var t = Template.instance();
     var srcId = t.srcId.get();
-    var collec = this.atts.collection;
+    var collect = this.atts.collection;
     var accept = this.atts.accept;
     t.checkInitialValue();
 
@@ -140,27 +143,54 @@ Template.afCloudinary.helpers({
       // if this is an original non-image, we return a flag...
       // YAY we get to map collections to image collections...
       var imgCollections = [
-        {rel: "Images", relType: "image", src: "Images"},
-        {rel: "Pdfs", relType: "pdf", src: "Pdfs"},
-        {rel: "ProfilePicture", relType: "image", src: "ProfilePicture"},
-        {rel: "Mediakit", relType: "pdf", src: "Mediakit"},
-        {rel: "Postimages", relType: "image", src: "Postimages"},
+        {rel: "Images", relType: "image", relSrc: "Images", params: {}},
+        {rel: "Pdfs", relType: "pdf", relSrc: "Pdfs"},
+        {rel: "ProfilePicture", relType: "image", relSrc: "ProfilePicture"},
+        {rel: "Mediakit", relType: "pdf", relSrc: "Mediakit"},
+        {rel: "Postimages", relType: "image", relSrc: "Postimages"},
 
       ];
 
+
       var theCollection = imgCollections.filter(function (o) {
-        return (o.rel === collec && accept.search(o.relType));
+        return (o.rel === collect && accept.search(o.relType));
       }).shift();
 
       console.log("logging inside previewUrl:helper in autoform-cloudinary.js");
       console.log(theCollection);
 
 
-      var imgSrc = theCollection && theCollection.src;
+      var imgSrc = theCollection && theCollection.relSrc;
+      console.log(imgSrc);
+
+      var pic;
 
       if (imgSrc) {
-        pic = global[imgSrc].findOne(srcId) || null;
+
+        switch (imgSrc) {
+          case "Images":
+            pic = Images.findOne(srcId);
+          break;
+          case "Pdfs":
+            pic = Pdfs.findOne(srcId);
+          break;
+          case "Postimages":
+            pic = Postimages.findOne(srcId);
+          break;
+          case "ProfilePicture":
+            pic = ProfilePicture.findOne(srcId);
+          break;
+          case "Mediakit":
+            pic = Mediakit.findOne(srcId);
+          break;
+        };
+
         theUrl = pic && pic.url() || null;
+
+        // var pic = global.Pdfs.findOne(srcId) || null;
+        // console.log(pic);
+        // theUrl = pic && pic.url() || null;
+        // console.log(theUrl);
       };
 
 
