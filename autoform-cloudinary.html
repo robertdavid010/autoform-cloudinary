@@ -2,6 +2,7 @@
 <!-- Template: afCloudinary; File; autoform-cloudinary.html -->
 
   <div class="afCloudinary">
+<<<<<<< HEAD
     {{!-- {{consoleLog 'inside afCloudinary template'}} --}}
     {{!-- {{consoleLog this}} --}}
 
@@ -40,8 +41,38 @@
     {{else}}
 
       <button type="button" class="btn btn-default center-block" data-action="afSelectFile">Choose File</button>
+=======
+
+      {{#if optimal}}<em class="text-muted small">{{optimal}}</em>{{/if}}
+    <div class="well text-centered" data-action="afDropUpload">
+
+      <img class="img-responsive img-rounded center-block afCloudinary-preview" src="{{previewUrl}}" lowsrc="{{lowresSrc}}">
+
+    </div>
+
+    {{!-- Display appropriate action button --}}
+    {{#if srcId}}
+
+      {{!-- Assumes that pdf uploads should have the ability to "remove" the file --}}
+      {{#unless in 'pdf' accept}}
+        <button type="button" class="btn btn-default center-block" data-action="afSelectFile">Replace</button>
+      {{else}}
+        <button type="button" class="btn btn-default center-block" data-action="afRemoveFile">Remove</button>
+      {{/unless}}
+
+    {{else}}
+
+      <button type="button" class="btn btn-default center-block" data-action="afSelectFile">{{label}}</button>
+>>>>>>> 63ff64d085e56e306c9bb8c36b2fcda42add6f99
 
     {{/if}}
+
+    {{!-- Display progress indicator --}}
+    <div class="progress afCloudinary-progress" style="display:none;">
+      <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100" style="width: 5%;">
+        <span class="sr-only">In Progress...</span>
+      </div>
+    </div>
 
     <input
       name="file"
@@ -49,13 +80,14 @@
       class="cloudinary-fileupload"
       data-cloudinary-field="image_id"
       style="display: none"
-      accept="{{accept}}"/>
+      accept="{{accept}}" 
+      />
 
-    <input {{atts}} type="hidden" name="srcId" value="{{srcId}}"/>
+    <input class="afCloudinary-Input" {{inputAtts}} type="hidden" name="srcId" value="{{srcId}}"/>
 
   </div>
 
-<!-- END Template: afCloudinary; File; autoform-cloudinary.html -->
+<!-- END Template: afCloudinary; File: autoform-cloudinary.html -->
 </template>
 
 
@@ -86,8 +118,7 @@
 
 
 
-<template name="afCloudinary_bootstrap4">
-<!-- Template: afCloudinary_bootstrap3; File; autoform-cloudinary.html -->
+<!-- <template name="afCloudinary_bootstrap4">
 {{consoleLog 'inside afCloudinary_bootstrap template'}}
 {{consoleLog this}}
 
@@ -117,5 +148,5 @@
       value="{{url}}"/>
   </div>
 
-<!-- END Template: afCloudinary_bootstrap3; File; autoform-cloudinary.html -->
 </template>
+ -->
