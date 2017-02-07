@@ -19,58 +19,9 @@ AutoForm.addInputType('cloudinary', {
 
 Template.afCloudinary.onCreated(function () {
   var self = this;
-  var t = Template.currentData();
-  // var collect = t.atts.collection;
-  var docType = t.atts.accept;
-  var formDoc = Template.parentData(9).currentDoc;
 
   self.srcId = new ReactiveVar();
 
-<<<<<<< HEAD
-  // check for data, check for cdy
-  
-
-  if (formDoc && docType && docType.search(/pdf/i)) {
-    // This is the pdf case
-    if (formDoc.pdf) {
-
-      self.srcId.set(formDoc.pdf);
-
-    } else if (formDoc.profile && formDoc.profile.mediakit) {
-
-      self.srcId.set(formDoc.profile.mediakit);
-
-    };
-
-
-  // We assume all other images
-  } else if (formDoc && formDoc.profile && formDoc.profile.picture) {
-
-    // this is a profile picture
-    self.srcId.set(formDoc.profile.picture);
-
-  } else if (formDoc && formDoc.picture) {
-    // this is some other picture
-    self.srcId.set(formDoc.picture);
-
-  };
-
-
-  self.initialValueChecked = false;
-  self.checkInitialValue = function () {
-    Tracker.nonreactive(function () {
-
-
-      // Set to existing form field value
-      if (! self.initialValueChecked && ! self.srcId.get() && self.data.value) {
-        self.srcId.set(self.data.value);
-        self.initialValueChecked = true;
-      };
-
-    });
-
-  };
-=======
   self.initialValueChecked = false;
   self.checkInitialValue = function () {
     Tracker.nonreactive(function () {
@@ -117,7 +68,6 @@ Template.afCloudinary.onCreated(function () {
     }); // END Tracker.nonreactive()
 
   }; // END self.checkinitialValue()
->>>>>>> 63ff64d085e56e306c9bb8c36b2fcda42add6f99
 
   // NOTE: Unused at the moment, is a manual server
   // call for the cloudinary method. We are using client side.
@@ -220,75 +170,6 @@ Template.afCloudinary.helpers({
   },
   previewUrl: function () {
     var t = Template.instance();
-<<<<<<< HEAD
-    var srcId = t.srcId.get();
-    var collect = this.atts.collection;
-    var accept = this.atts.accept;
-    t.checkInitialValue();
-
-    // Cloudinary record includes version which starts
-    // with 'v' first char and contains '/'
-    if (srcId && srcId.startsWith("v") && srcId.includes("/")) {
-      // This is a couldinary resource
-      // Force '.png' for previewing all files
-      theUrl = $.cloudinary.url(srcId + ".png", {width: 480, height: 220, crop: 'limit'});
-    } else if (srcId) {
-      // We assume this is a file repo
-      // Also check for types
-      // if this is an original non-image, we return a flag...
-      // YAY we get to map collections to image collections...
-      var imgCollections = [
-        {rel: "Images", relType: "image", relSrc: "Images", params: {}},
-        {rel: "Pdfs", relType: "pdf", relSrc: "Pdfs"},
-        {rel: "ProfilePicture", relType: "image", relSrc: "ProfilePicture"},
-        {rel: "Mediakit", relType: "pdf", relSrc: "Mediakit"},
-        {rel: "Postimages", relType: "image", relSrc: "Postimages"},
-
-      ];
-
-
-      var theCollection = imgCollections.filter(function (o) {
-        return (o.rel === collect && accept.search(o.relType));
-      }).shift();
-
-      console.log("logging inside previewUrl:helper in autoform-cloudinary.js");
-      console.log(theCollection);
-
-
-      var imgSrc = theCollection && theCollection.relSrc;
-      console.log(imgSrc);
-
-      var pic;
-
-      if (imgSrc) {
-
-        switch (imgSrc) {
-          case "Images":
-            pic = Images.findOne(srcId);
-          break;
-          case "Pdfs":
-            pic = Pdfs.findOne(srcId);
-          break;
-          case "Postimages":
-            pic = Postimages.findOne(srcId);
-          break;
-          case "ProfilePicture":
-            pic = ProfilePicture.findOne(srcId);
-          break;
-          case "Mediakit":
-            pic = Mediakit.findOne(srcId);
-          break;
-        };
-
-        theUrl = pic && pic.url() || null;
-
-        // var pic = global.Pdfs.findOne(srcId) || null;
-        // console.log(pic);
-        // theUrl = pic && pic.url() || null;
-        // console.log(theUrl);
-      };
-
-=======
     var as = t.data && t.data.atts;
     var cdy = as.cdyParams || null;
     // These are the default dimensions
@@ -312,7 +193,6 @@ Template.afCloudinary.helpers({
         } else {
           conf.width = 600; conf.height = 320;
         }
->>>>>>> 63ff64d085e56e306c9bb8c36b2fcda42add6f99
 
       }
     }

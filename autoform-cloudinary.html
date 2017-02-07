@@ -2,46 +2,6 @@
 <!-- Template: afCloudinary; File; autoform-cloudinary.html -->
 
   <div class="afCloudinary">
-<<<<<<< HEAD
-    {{!-- {{consoleLog 'inside afCloudinary template'}} --}}
-    {{!-- {{consoleLog this}} --}}
-
-    {{!-- <h5 class="text-left EXO-text-heading">{{label}} --}}
-    {{!-- <small class="text-muted"> (IF NECESSARY)</small></h5> --}}
-
-{{!--     {{#if previewUrl}}
-    <em class="text-muted">{{previewUrl}}</em>
-    {{else}}
-    <em class="text-muted">There was no origPic</em>
-    {{/if}}
- --}}
-    <div class="well text-centered" data-action="afDropUpload">
-
-      {{#if srcId}}
-
-        <a href="{{previewUrl}}" target="_blank">
-          <img class="img-responsive img-rounded center-block" src="{{previewUrl}}">
-        </a>
-
-      {{else}}
-        {{#if in accept 'pdf'}}
-          <img class="img-responsive center-block" src="/img/icons/iconPDF_64.png">
-        {{else}}
-          <img class="img-responsive center-block" src="/img/icons/iconCampaignImage_64.png">
-        {{/if}}
-      {{/if}}
-
-    </div>
-
-
-    {{#if srcId}}
-
-      <button type="button" class="btn btn-default center-block" data-action="afRemoveFile">Remove</button>
-
-    {{else}}
-
-      <button type="button" class="btn btn-default center-block" data-action="afSelectFile">Choose File</button>
-=======
 
       {{#if optimal}}<em class="text-muted small">{{optimal}}</em>{{/if}}
     <div class="well text-centered" data-action="afDropUpload">
@@ -63,7 +23,6 @@
     {{else}}
 
       <button type="button" class="btn btn-default center-block" data-action="afSelectFile">{{label}}</button>
->>>>>>> 63ff64d085e56e306c9bb8c36b2fcda42add6f99
 
     {{/if}}
 
