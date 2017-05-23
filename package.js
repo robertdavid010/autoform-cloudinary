@@ -17,7 +17,7 @@ Package.onUse(function (api) {
     'reactive-var',
     'underscore',
     'nekojira:cloudinary-jquery-upload@0.1.0',
-    'aldeed:autoform@5.3.0'
+    'aldeed:autoform@6.1.0'
   ], 'client');
 
   api.addFiles([
@@ -26,7 +26,14 @@ Package.onUse(function (api) {
     'autoform-cloudinary.js'
   ], 'client');
 
+
   api.addFiles([
     'autoform-cloudinary-server.js'
   ], 'server');
+
+  api.addAssets([
+    'public/img/iconImage_64.png',
+    'public/img/iconPDF_64.png',
+    ],'client');
+
 });

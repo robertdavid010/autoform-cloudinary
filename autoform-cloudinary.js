@@ -135,10 +135,12 @@ Template.afCloudinary.onRendered(function () {
   self.$(cdyElem).bind('fileuploadadd', function(e, data) {
     self.$("button[type=button]").hide();
     self.$(".progress").show();
+    console.log("started uploading...");
   });
 
   self.$(cdyElem).on('fileuploaddone', function (e, data) {
     var res = data.result;
+    console.log("we have a file upload result");
     if (res) {
       self.$(".progress").hide();
       self.$("button[type=button]").show();
@@ -163,35 +165,39 @@ Template.afCloudinary.helpers({
     var t = Template.instance();
     var as = t.data.atts;
     if (as.accept.toLowerCase().indexOf("pdf") != -1) {
-      return "/img/icons/iconPDF_64.png";
+      return "/packages/cosio55_autoform-cloudinary/public/img/iconPDF_64.png";
     } else {
-      return "/img/icons/iconCampaignImage_64.png";
+      return "/packages/cosio55_autoform-cloudinary/public/img/iconImage_64.png";
     }
   },
   previewUrl: function () {
     var t = Template.instance();
     var as = t.data && t.data.atts;
     var cdy = as.cdyParams || null;
-    // These are the default dimensions
-    var conf = {width: 480, height: 270};
+    var conf = {};
+    // Set values or default
+    conf.width = cdy && cdy.previewW || 480;
+    conf.height = cdy && cdy.previewH || 270;
+    conf.crop = cdy && cdy.previewCrop || "fill"; // Default crop
 
     if (as.accept.toLowerCase().indexOf("pdf") != -1) {
-      conf.crop = "limit";
+      conf.crop = cdy && cdy.previewCrop || "limit"; // Default crop override for PDF documents
     } else {
-      conf.crop = "fill";
-      // Assume any field with profile in it, will be a square img
-      // TODO: check for schema dimenstions to determine preview size (1/2 etc)
+
       if (as["data-schema-key"].toLowerCase().indexOf("profile") != -1 || as.name.toLowerCase().indexOf("profile") != -1) {
-        if (cdy && cdy.width && cdy.height) {
-          conf.width = cdy.width; conf.height = cdy.height;
-        } else {
+        // Assume any field with profile in it, will be a square img
+        if (!(cdy && cdy.previewW && cdy.previewH)) {
           conf.width = 256; conf.height = 256;
         }
       } else {
-        if (cdy) {
-          conf.width = cdy.width/2; conf.height = cdy.height/2;
+
+        if (!(cdy && cdy.previewW && cdy.previewH) && cdy.maxWidth && cdy.maxHeight) {
+          // Set preview = 1/2 max dimensions if nothing else
+          conf.width = cdy.maxWidth/2; conf.height = cdy.maxHeight/2;
         } else {
-          conf.width = 600; conf.height = 320;
+          // Set preview widths as defined in schema
+          conf.width = cdy && cdy.previewW || 320;
+          conf.height = cdy && cdy.previewH || 600;
         }
 
       }
@@ -200,13 +206,16 @@ Template.afCloudinary.helpers({
     var srcId = t.srcId.get();
     var theUrl;
     t.checkInitialValue();
+
     if (srcId) {
       theUrl = $.cloudinary.url(srcId + ".png", conf);
     } else if (as.accept.toLowerCase().indexOf("pdf") != -1) {
-      theUrl = "/img/icons/iconPDF_64.png";
+      theUrl = cdy && cdy.placeholderImg || "/packages/cosio55_autoform-cloudinary/public/img/iconPDF_64.png";
     } else {
-      theUrl = "/img/icons/iconCampaignImage_64.png";
+      theUrl = cdy && cdy.placeholderImg || "/packages/cosio55_autoform-cloudinary/public/img/iconImage_64.png";
     }
+    console.log("preview url...");
+    console.log(theUrl);
     return theUrl;
   },
 
@@ -225,7 +234,7 @@ Template.afCloudinary.helpers({
       if (ats.accept.toLowerCase().indexOf("pdf") != -1) {
         return "(Max file size: " + cdy.maxFileSize + "MB)"
       } else {
-        return "(Optimal size: " + cdy.width + " x " + cdy.height + ")";
+        return "(Optimal size: " + cdy.maxWidth + " x " + cdy.maxHeight + ")";
       }
     } else {
       return null
@@ -251,26 +260,41 @@ Template.afCloudinary.helpers({
       }
     }
     return attributes;
+  },
+
+  helpText: function () {
+    return this.atts.cdyParams.helpText || null
   }
 
 });
 
 Template.afCloudinary.events({
 
-  "dragover data-action[data-action='afDropUpload']": function(e) {
+  "click [data-action='afDropUpload']": function(e) {
     // TODO: Enable this feature
+    console.log("trying to click afDropUpload event");
+    e.stopPropagation();
+    e.preventDefault();
+    $(e.currentTarget).siblings("input.cloudinary-fileupload[type=file]").click();
+  },
+
+  "dragover [data-action='afDropUpload']": function(e) {
+    // TODO: Enable this feature
+    console.log("trying to dragover afSelectFile event");
     e.stopPropagation();
     e.preventDefault();
   },
 
-  "dragenter data-action[data-action='afDropUpload']": function(e) {
+  "dragenter [data-action='afDropUpload']": function(e) {
     // TODO: Enable this feature
+    console.log("trying to dragenter afSelectFile event");
     e.stopPropagation();
     e.preventDefault();
   },
 
-  "drop data-action[data-action='afDropUpload']": function(e, t) {
+  "drop [data-action='afDropUpload']": function(e, t) {
     // TODO: Test & enable this feature
+    console.log("trying to drop afSelectFile event");
     e.stopPropagation();
     e.preventDefault();
 
@@ -281,6 +305,8 @@ Template.afCloudinary.events({
 
   "click [data-action='afSelectFile']": function (e, t) {
     // Manully trigger hidden element
+    e.stopPropagation();
+    e.preventDefault();
     $(e.currentTarget).siblings("input.cloudinary-fileupload[type=file]").click();
   },
 
