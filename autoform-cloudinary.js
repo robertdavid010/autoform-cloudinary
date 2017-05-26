@@ -135,12 +135,10 @@ Template.afCloudinary.onRendered(function () {
   self.$(cdyElem).bind('fileuploadadd', function(e, data) {
     self.$("button[type=button]").hide();
     self.$(".progress").show();
-    console.log("started uploading...");
   });
 
   self.$(cdyElem).on('fileuploaddone', function (e, data) {
     var res = data.result;
-    console.log("we have a file upload result");
     if (res) {
       self.$(".progress").hide();
       self.$("button[type=button]").show();
@@ -214,8 +212,6 @@ Template.afCloudinary.helpers({
     } else {
       theUrl = cdy && cdy.placeholderImg || "/packages/cosio55_autoform-cloudinary/public/img/iconImage_64.png";
     }
-    console.log("preview url...");
-    console.log(theUrl);
     return theUrl;
   },
 
