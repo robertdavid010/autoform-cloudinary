@@ -224,17 +224,15 @@ Template.afCloudinary.helpers({
 
   // Will display defined limits in input templates based on schema
   optimal: function () {
-    var ats = this.atts;
-    var cdy = ats.cdyParams
+    var cdy = this.atts && this.atts.cdyParams
     if (cdy) {
-      if (ats.accept.toLowerCase().indexOf("pdf") != -1) {
+      if (cdy.maxFileSize) {
         return "(Max file size: " + cdy.maxFileSize + "MB)"
-      } else {
+      } else if (cdy.maxWidth && cdy.maxHeight) {
         return "(Optimal size: " + cdy.maxWidth + " x " + cdy.maxHeight + ")";
       }
-    } else {
-      return null
     }
+    return null
   },
 
   accept: function () {
