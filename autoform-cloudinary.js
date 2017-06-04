@@ -138,6 +138,7 @@ Template.afCloudinary.onRendered(function () {
   });
 
   self.$(cdyElem).on('fileuploaddone', function (e, data) {
+    // Event trigger for client upload completed
     var res = data.result;
     if (res) {
       self.$(".progress").hide();
@@ -146,6 +147,10 @@ Template.afCloudinary.onRendered(function () {
       self.srcId.set("v" + res.version + "/" + res.public_id);
       Tracker.afterFlush(function() {
         self.$(".afCloudinary-Input").trigger("change");
+        // Param to trigger submit immediately
+        if (self.data.atts.cdyParams.autoSubmit) {
+          $(".afCloudinary-Input").closest("form").submit();
+        }
       });
       Tracker.flush();
     }
@@ -266,7 +271,6 @@ Template.afCloudinary.events({
 
   "click [data-action='afDropUpload']": function(e) {
     // TODO: Enable this feature
-    console.log("trying to click afDropUpload event");
     e.stopPropagation();
     e.preventDefault();
     $(e.currentTarget).siblings("input.cloudinary-fileupload[type=file]").click();
@@ -274,21 +278,18 @@ Template.afCloudinary.events({
 
   "dragover [data-action='afDropUpload']": function(e) {
     // TODO: Enable this feature
-    console.log("trying to dragover afSelectFile event");
     e.stopPropagation();
     e.preventDefault();
   },
 
   "dragenter [data-action='afDropUpload']": function(e) {
     // TODO: Enable this feature
-    console.log("trying to dragenter afSelectFile event");
     e.stopPropagation();
     e.preventDefault();
   },
 
   "drop [data-action='afDropUpload']": function(e, t) {
     // TODO: Test & enable this feature
-    console.log("trying to drop afSelectFile event");
     e.stopPropagation();
     e.preventDefault();
 
